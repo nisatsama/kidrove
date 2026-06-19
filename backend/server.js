@@ -13,10 +13,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: [
-      "https://kidrove.vercel.app", // Replace with your frontend URL
-      "http://localhost:5173", // Local development
-    ],
+    origin: ["https://kidrove-lyart.vercel.app", "http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true,
   }),
