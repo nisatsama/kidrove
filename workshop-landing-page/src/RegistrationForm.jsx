@@ -19,7 +19,7 @@ export default function RegistrationForm() {
     setSubmitted(true);
 
     try {
-      const res = await fetch("http://localhost:5000/enquiry", {
+      const res = await fetch("https://kidrove-api-alpha.vercel.app/enquiry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
