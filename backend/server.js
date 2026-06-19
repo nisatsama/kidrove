@@ -3,19 +3,37 @@ import mongoose from "mongoose";
 import Enquiry from "./model/Enquiry.js";
 import cors from "cors";
 import dotenv from "dotenv";
+
 dotenv.config();
+
 const app = express();
 
+// Middleware
 app.use(express.json());
-app.use(cors());
 
-// ✅ MongoDB Connection
+app.use(
+  cors({
+    origin: [
+      "https://kidrove.vercel.app", // Replace with your frontend URL
+      "http://localhost:5173", // Local development
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  }),
+);
+
+// MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
   .catch((err) => console.error("MongoDB Error ❌", err));
 
-// ✅ POST API
+// Health Check Route
+app.get("/", (req, res) => {
+  res.status(200).send("Server is running 🚀");
+});
+
+// Enquiry API
 app.post("/enquiry", async (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
@@ -28,8 +46,9 @@ app.post("/enquiry", async (req, res) => {
       });
     }
 
-    // Email validation
+    // Email Validation
     const emailRegex = /\S+@\S+\.\S+/;
+
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
@@ -37,7 +56,7 @@ app.post("/enquiry", async (req, res) => {
       });
     }
 
-    // ✅ Save to MongoDB
+    // Save to MongoDB
     const newEnquiry = new Enquiry({
       name,
       email,
@@ -53,18 +72,13 @@ app.post("/enquiry", async (req, res) => {
       data: newEnquiry,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Enquiry Error:", err);
+
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server Error",
     });
   }
 });
-app.get("/", (req, res) => {
-  res.send("Server is running");
-});
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+
+export default app;
